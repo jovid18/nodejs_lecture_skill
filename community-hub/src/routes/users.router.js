@@ -1,5 +1,6 @@
 import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
+import bcrypt from 'bcrypt';
 
 const router = express.Router();
 //post api
@@ -13,10 +14,11 @@ router.post('/sign-up', async (req, res, next) => {
   if (isExistUser) {
     return res.status(409).json({ message: '이미 존재하는 이메일입니다.' });
   }
+  const hashedPassword = await bcrypt.hash(password, 10);
   const user = await prisma.users.create({
     data: {
       email,
-      password,
+      password: hashedPassword,
     },
   });
   const userInfo = await prisma.userInfos.create({
