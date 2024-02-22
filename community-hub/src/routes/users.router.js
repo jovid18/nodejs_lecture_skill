@@ -2,7 +2,7 @@ import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
 
 const router = express.Router();
-
+//post api
 router.post('/sign-up', async (req, res, next) => {
   const { email, password, name, age, gender, profileImage } = req.body;
   const isExistUser = await prisma.users.findFirst({
