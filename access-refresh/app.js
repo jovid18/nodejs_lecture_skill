@@ -18,6 +18,32 @@ app.get('/', (req, res) => {
   return res.status(200).send('Hello Token!');
 });
 
+const tokenStorages = {};
+
+//액세스, 리프레시 토큰 발급 API
+app.post('/tokens', async (req, res) => {
+  const { id } = req.body;
+  // 액세스 토큰과 리프레시 토큰을 발급
+  const accessToken = jwt.sign({ id: id }, ACCESS_TOKEN_SECRET_KEY, {
+    expiresIn: '10s',
+  });
+  const refreshToken = jwt.sign({ id: id }, REFRESH_TOKEN_SECRET_KEY, {
+    expiresIn: '1m',
+  });
+  tokenStorages[refreshToken] = {
+    id: id,
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+  };
+  //클라이언트에게 쿠키(토큰)을 할당
+  res.cookie('accessToken', accessToken);
+  res.cookie('refreshToken', refreshToken);
+
+  return res
+    .status(200)
+    .json({ message: 'Token이 정상적으로 발급되었습니다. ' });
+});
+
 app.listen(PORT, () => {
   console.log(PORT, '포트로 서버가 열렸어요!');
 });
