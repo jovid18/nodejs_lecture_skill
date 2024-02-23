@@ -2,21 +2,25 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import expressSession from 'express-session';
 import expressMySQLSession from 'express-mysql-session';
+import dotenv from 'dotenv';
 import UsersRouter from './routes/users.router.js';
 import PostsRouter from './routes/posts.router.js';
 import CommentsRouter from './routes/comments.router.js';
 import LogMiddleware from './middlewares/log.middleware.js';
 import ErrorHandlingMiddleware from './middlewares/error-handling.middleware.js';
+
+dotenv.config();
+
 const app = express();
 const PORT = 3018;
 
 const MySQLStore = expressMySQLSession(expressSession);
 const sessionStore = new MySQLStore({
-  user: 'root',
-  password: 'cshcho99',
-  host: 'express-database.cxm4yimyycnl.ap-northeast-2.rds.amazonaws.com',
-  port: 3306,
-  database: 'community_hub',
+  user: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  host: process.env.DATABASE_HOST,
+  port: process.env.DATABASE_PORT,
+  database: process.env.DATABASE_NAME,
   expiration: 1000 * 60 * 60 * 24,
   createDatabaseTable: true,
 });
@@ -25,7 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   expressSession({
-    secret: 'custum-secret-key',
+    secret: process.env.SESSION_SECRET_KEY,
     resave: false,
     saveUninitialized: false,
     cookie: {
