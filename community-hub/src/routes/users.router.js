@@ -63,13 +63,14 @@ router.post('/sign-in', async (req, res, next) => {
   if (!(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
   }
-  const token = jwt.sign({ userId: user.userId }, 'custom-secret-key');
-  res.cookie('authorization', `Bearer ${token}`);
+
+  req.session.userId = user.userId;
   return res.status(200).json({ message: '로그인에 성공하였습니다.' });
 });
 
 router.get('/users', authMiddleware, async (req, res, next) => {
   const { userId } = req.user;
+  console.log(userId);
   const user = await prisma.users.findFirst({
     where: {
       userId: +userId,
