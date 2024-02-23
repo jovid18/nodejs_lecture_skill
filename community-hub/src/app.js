@@ -1,6 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import expressSession from 'express-session';
+import expressMySQLSession from 'express-mysql-session';
 import UsersRouter from './routes/users.router.js';
 import PostsRouter from './routes/posts.router.js';
 import CommentsRouter from './routes/comments.router.js';
@@ -9,6 +10,16 @@ import ErrorHandlingMiddleware from './middlewares/error-handling.middleware.js'
 const app = express();
 const PORT = 3018;
 
+const MySQLStore = expressMySQLSession(expressSession);
+const sessionStore = new MySQLStore({
+  user: 'root',
+  password: 'cshcho99',
+  host: 'express-database.cxm4yimyycnl.ap-northeast-2.rds.amazonaws.com',
+  port: 3306,
+  database: 'community_hub',
+  expiration: 1000 * 60 * 60 * 24,
+  createDatabaseTable: true,
+});
 app.use(LogMiddleware);
 app.use(express.json());
 app.use(cookieParser());
@@ -20,6 +31,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24,
     },
+    store: sessionStore,
   })
 );
 
