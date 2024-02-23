@@ -16,8 +16,22 @@ app.use(
       // 세션 쿠키 설정
       maxAge: 1000 * 60 * 60 * 24, // 쿠키의 만료 기간을 1일로 설정합니다.
     },
-  }),
+  })
 );
+
+//세션 등록 API
+app.post('/sessions', (req, res, next) => {
+  const { userId } = req.body;
+  req.session.userId = userId;
+  return res.status(201).json({ message: '세션이 등록되었습니다.' });
+});
+
+app.get('/sessions', (req, res, next) => {
+  return res.status(200).json({
+    message: '세션을 조회하였습니다.',
+    session: req.session.userId ?? null,
+  });
+});
 
 app.listen(PORT, () => {
   console.log(PORT, '포트로 서버가 열렸어요!');
